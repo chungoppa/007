@@ -163,16 +163,6 @@ def getorderfromlist(list):
         strorder = strorder + str(i) +' : x '+ str(count) +'    -    ' + str(price)+'\n'
     return strorder + '\n Total :'+str(totalprice)
 
-# def getReportofOrder(event,rowinTmpuserInfo):
-#     question_list = questionssheet.row_values(2)
-#     tmpuserinfo_list = tmpuserinfo.row_values(rowinTmpuserInfo)
-#     getUserInfofromList(question_list,tmpuserinfo_list)
-#     line_bot_api.reply_message(event.reply_token,TextSendMessage(text=getUserInfofromList(question_list,tmpuserinfo_list),quick_reply=QuickReply(items=[
-#                 QuickReplyButton(
-#                     action=MessageAction(label="Ok", text="ok")
-#                 ), QuickReplyButton(
-#                     action=MessageAction(label="Edit", text="edit")
-#                 )])))
 def getUserInfofromList(qlist,ulist):
     string = 'Here is your infomation :'
     i=1
@@ -498,7 +488,6 @@ def addtocart(event,orderid):
 def stfu():
     for richmenu in line_bot_api.get_rich_menu_list():
         print(richmenu)
-    line_bot_api.delete_rich_menu('richmenu-6522fcbec865c1c1053cd65bd09d8160')
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
