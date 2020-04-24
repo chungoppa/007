@@ -69,8 +69,6 @@ def sendGreetingms(event):
             TextSendMessage(text='ご登録ありがとうございます。 \nこちらは居酒屋「くーろん」・原田商店のページでございます。\nこちらからレストラン予約・食材、弁当のデリバリー注文が可能です。 \n下記メニューからお進みください。\n今後とも宜しくお願いします。'))
 
 def getchars(list):
-
-
     chuoi1=''
     for c in list:
         if not c.isdigit() :
@@ -95,10 +93,8 @@ def phonenumbervalidator(phonenumber):
         counter =counter+1
         if not n.isdigit():
             digit = False
-    if digit == False:
-        return 'phonenumber must not include character'
-    if counter >10 and counter <9 :
-        return 'phonenumber must be between 9 and 10 character'
+    if digit == False or counter >10 or counter<9:
+        return '電話番号は数値を入力してください。'
     return 'ok'
 @handler.add((MessageEvent),message=TextMessage)
 def getUserinfo(event):
@@ -147,7 +143,7 @@ def getUserinfo(event):
         elif col == 7 and (not cell_list is None):
             tmpuserinfo.update_cell(row, col, text)
             cell_listo= []
-            cell_list = tmpordersheet.range('B' + str(tmp.row) + ':Z' + str(tmp.row))
+            cell_list = tmpordersheet.range('C' + str(tmp.row) + ':Z' + str(tmp.row))
             for cell in cell_list:
                 if not cell.value == '':
                     cell_listo.append(cell.value)
@@ -171,7 +167,7 @@ def getUserinfo(event):
 
         elif col is None and ( not cell_list is None) and text == 'デリバリー':
             cell_listo= []
-            cell_list = tmpordersheet.range('B' + str(tmp.row) + ':Z' + str(tmp.row))
+            cell_list = tmpordersheet.range('C' + str(tmp.row) + ':Z' + str(tmp.row))
             for cell in cell_list:
                 if not cell.value == '':
                     cell_listo.append(cell.value)
@@ -264,7 +260,7 @@ def getpricebyname(name):
     elif name == '中華丼（ソースのみ）':
         return 100000
 
-# '生鮮食品
+# '生鮮食品  1
 def submenu1(event):
     サンマの開き = request.url_root + '/static/サンマの開き.JPG'
     塩サバ切り身 = request.url_root + '/static/塩サバ切り身.JPG'
@@ -282,9 +278,9 @@ def submenu1(event):
     ])
     template_message = TemplateSendMessage(
         alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
-    line_bot_api.reply_message(event.reply_token, template_message)
+    line_bot_api.push_message(event.source.user_id, template_message)
 
-# 一品物
+# 一品物 4
 def submenu2(event):
     紅茶豚= request.url_root + '/static/紅茶豚（スライス５枚）.JPG'
     手作り = request.url_root + '/static/1.JPG'
@@ -326,7 +322,7 @@ def submenu2(event):
         alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
     line_bot_api.reply_message(event.reply_token, template_message)
 
-# お潰物・サラダ他　約一人前
+# お潰物・サラダ他　約一人前 2
 def submenu3(event):
     野菜サラダ = request.url_root + '/static/野菜サラダ.JPG'
     carousel_template = CarouselTemplate(columns=[
@@ -337,7 +333,7 @@ def submenu3(event):
         alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
     line_bot_api.reply_message(event.reply_token, template_message)
 
-# お惣菜1袋50ｇ 約一人前
+# お惣菜1袋50ｇ 約一人前 3
 def submenu4(event):
     れんこんキンピラ = request.url_root + '/static/れんこんキンピラ.JPG'
     ひじきの炒め煮 = request.url_root + '/static/ひじきの炒め煮.JPG'
@@ -385,24 +381,30 @@ def showsubmenu(event):
     # line_bot_api.reply_message(event.reply_token, template_message)
 
 def chonsoluong(event,name):
-    line_bot_api.push_message(event.source.user_id,
-                              TextSendMessage(text='chon so luong cua mon an' + name, quick_reply=QuickReply(
-                                  items=[
-                                      QuickReplyButton(action=PostbackAction(label='1', data='1'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='2', data='2'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='3', data='3'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='4', data='4'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='5', data='5'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='6', data='6'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='7', data='7'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='8', data='8'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='9', data='9'+name)),
-                                      QuickReplyButton(action=PostbackAction(label='10', data='10'+name)),
-                                  ])))
+    row = None
+    try:
+        cell = tmpordersheet.find(str(event.source.user_id))
+        row = cell.row
+    except :
+        tmpordersheet.insert_row([str(event.source.user_id)])
+        cell = tmpordersheet.find(str(event.source.user_id))
+        row = cell.row
+    if not row == None:
+
+        tmpordersheet.update_cell(row,2,name)
+        buttons_template = ButtonsTemplate(title=name, text='数量を選択してください。', actions=[
+            MessageAction(label='1', text='1'),
+            MessageAction(label='2', text='2'),
+            MessageAction(label='3', text='3'),
+            PostbackAction(label='数量を入力', data='nhapsoluong')
+        ])
+        template_message = TemplateSendMessage(
+            alt_text='Buttons alt text', template=buttons_template)
+        line_bot_api.reply_message(event.reply_token, template_message)
 def showitemsincart(event):
     cell_listo = []
     tmp = tmpordersheet.find(str(event.source.user_id))
-    cell_list = tmpordersheet.range('B' + str(tmp.row) + ':ZZ' + str(tmp.row))
+    cell_list = tmpordersheet.range('C' + str(tmp.row) + ':ZZ' + str(tmp.row))
     for cell in cell_list:
         if not cell.value == '':
             cell_listo.append(cell.value)
@@ -415,6 +417,8 @@ def handle_postback(event):
     # sub1
     if event.postback.data == 'サンマの開き':
         chonsoluong(event,'サンマの開き')
+    if event.postback.data == 'nhapsoluong':
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='数量を入力してください。'))
         # addtocart(event, "サンマの開き")
         # showitemsincart(event)
     elif event.postback.data == '塩サバ切り身':
@@ -444,13 +448,12 @@ def handle_postback(event):
         chonsoluong(event,'レバニラ炒め')
     elif event.postback.data == '手羽醤油焼き':
         chonsoluong(event,'手羽醤油焼き')
-
     elif event.postback.data == '中華丼（ソースのみ）':
         chonsoluong(event,'中華丼（ソースのみ）')
     #     sub3
     elif event.postback.data == '野菜サラダ':
         chonsoluong(event,'野菜サラダ')
-    #         sub4
+    #      sub4
     elif event.postback.data == 'れんこんキンピラ':
         chonsoluong(event,'れんこんキンピラ')
     elif event.postback.data == 'ひじきの炒め煮':
@@ -462,7 +465,7 @@ def handle_postback(event):
         row = str(tmpuserinfo.find(str(event.source.user_id)).row)
         tmpuserinfo.update_cell(row, 6, datetime)
         line_bot_api.reply_message(event.reply_token,[
-                                   TextSendMessage(text='ok i got your time : '+datetime ),
+                                   TextSendMessage(text='ご希望の配達日時は'+datetime +'ですね。'),
                                     TextSendMessage(text='その他特別な要求がありますか？')])
     elif getnums(event.postback.data) == '1':
         addtocart(event, getchars(event.postback.data),1)
@@ -501,14 +504,8 @@ def handle_location_message(event):
     row = str(tmpuserinfo.find(str(event.source.user_id)).row)
     tmpuserinfo.update_cell(row, 4, address)
     line_bot_api.reply_message(event.reply_token, [
-        TextSendMessage(text='ok i got your address : ' + address),
+        TextSendMessage(text='住所は'+ address+'ですね。' ),
         TextSendMessage(text='マンション名を教えてください。')])
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     LocationSendMessage(
-    #         title='Location', address=event.message.address,
-    #         latitude=event.message.latitude, longitude=event.message.longitude
-    #     ))
 def addtocart(event,name,num):
     # tmp = None
     x = 0
@@ -520,25 +517,13 @@ def addtocart(event,name,num):
         renew = [str(event.source.user_id), name]
         tmpordersheet.insert_row(renew)
     else:
-        row = str(tmp.row)
-        cell_list = tmpordersheet.range('A'+row +':ZZ'+row)
-        # currentblankcell =0
-        # for cell in cell_list:
-        #     if cell.value =='':
-        #         currentblankcell = cell.col
-        # for i in range(num):
-        #     x=x+1
-        #     tmpordersheet.update_cell(cell.row,cell.col+i,name)
-        #     if x ==num:
-        #         return
-
-        for cell in cell_list:
-            if cell.value == '':
-                for i in range(num):
-                    x=x+1
-                    tmpordersheet.update_cell(cell.row,cell.col+i,name)
-                    if x == num:
-                        return
+        row = tmp.row
+        listoftmporder = tmpordersheet.row_values(row)
+        for i in range(num):
+            listoftmporder.append(name)
+        print(listoftmporder)
+        tmpordersheet.delete_row(row)
+        tmpordersheet.insert_row(listoftmporder)
 
 def richmenuRegister():
     richmenuimg = request.url_root + '/static/richmenu.png'
@@ -570,34 +555,76 @@ def richmenuRegister():
 
     line_bot_api.set_rich_menu_image('richmenu-8bcf01b606fe280c1b4a11760fd48a16','image/png', response.data)
     line_bot_api.set_default_rich_menu('richmenu-8bcf01b606fe280c1b4a11760fd48a16')
+def getsubmenubyname(name):
+    if name == 'サンマの開き':
+        return 1
+    elif name == '塩サバ切り身':
+        return 1
+    elif name == 'サケ切り身':
+        return 1
+    elif name == 'サワラの味噌漬け':
+        return 1
+    elif name == '野菜サラダ':
+        return 2
+    elif name == 'れんこんキンピラ':
+        return 3
+    elif name == 'ひじきの炒め煮':
+        return 3
+    elif name == '高菜のじゃこ炒め':
+        return 3
+    elif name == '紅茶豚（スライス５枚）':
+        return 4
+    elif name == '手作り冷凍餃子（５個）':
+        return 4
+    elif name == '砂肝にんにく炒め':
+        return 4
+    elif name == 'ハンバーグ（ソース付）':
+        return 4
+    elif name == 'エビチリ':
+        return 4
+    elif name == 'サバの味噌煮':
+        return 4
+    elif name == '豚生姜焼き':
+        return 4
+    elif name == 'レバニラ炒め':
+        return 4
+    elif name == '手羽醤油焼き':
+        return 4
+    elif name == '中華丼（ソースのみ）':
+        return 4
 
-
-def stfu(event,name):
-    name ='asd'
-    # for richmenu in line_bot_api.get_rich_menu_list():
-    #     print(richmenu.rich_menu_id)
-    # line_bot_api.delete_rich_menu('richmenu-11a24556ee8cd47c2dfb697c918fd036')
-    # line_bot_api.delete_rich_menu('richmenu-c32df4a8a77e599b1fe4f748f335d97f')
-    buttons_template = ButtonsTemplate(text=' ', actions=[
-        PostbackAction(label='chon so luong', data='stfu'+'0'+name)
-    ])
-    template_message = TemplateSendMessage(
-        alt_text='Buttons alt text', template=buttons_template)
-    line_bot_api.reply_message(event.reply_token, template_message)
-
-
+def isnumber(list):
+    a = True
+    for n in list:
+        if not n.isdigit():
+            a = False
+    return a
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    message = TextSendMessage(text=event.message.text)
     text = event.message.text
     if text== 'getid':
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=event.source.user_id))
+    if isnumber(text) == True :
+        cell = tmpordersheet.find(str(event.source.user_id))
+        row = cell.row
+        if not tmpordersheet.cell(row,2).value == None:
+            name = str(tmpordersheet.cell(row,2).value)
+            addtocart(event,name,int(text))
+            showitemsincart(event)
+            if getsubmenubyname(name) == 1:
+                submenu1(event)
+            if getsubmenubyname(name) == 2 :
+                submenu3(event)
+            if getsubmenubyname(name) == 3:
+                submenu4(event)
+            if getsubmenubyname(name) == 4:
+                submenu2(event)
     # elif text =='1':
     #     richmenuRegister()
-    elif text == '2':
-        stfu(event)
+    # elif text == '2':
+    #     stfu(event)
     elif text == 'レストラン予約':
         line_bot_api.reply_message(
             event.reply_token,
