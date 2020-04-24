@@ -320,7 +320,7 @@ def submenu2(event):
     ])
     template_message = TemplateSendMessage(
         alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
-    line_bot_api.reply_message(event.reply_token, template_message)
+    line_bot_api.push_message(event.source.user_id, template_message)
 
 # お潰物・サラダ他　約一人前 2
 def submenu3(event):
@@ -331,7 +331,7 @@ def submenu3(event):
     ])
     template_message = TemplateSendMessage(
         alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
-    line_bot_api.reply_message(event.reply_token, template_message)
+    line_bot_api.push_message(event.source.user_id, template_message)
 
 # お惣菜1袋50ｇ 約一人前 3
 def submenu4(event):
@@ -359,26 +359,8 @@ def showsubmenu(event):
         ])
     template_message = TemplateSendMessage(
         alt_text='Buttons alt text', template=buttons_template)
-    line_bot_api.reply_message(event.reply_token, template_message)
+    line_bot_api.push_message(event.source.user_id, template_message)
 
-    # carousel_template = CarouselTemplate(columns=[
-    #     CarouselColumn(text=' ', title='生鮮食品', actions=[
-    #         MessageAction(label='生鮮食品', text='生鮮食品')
-    #     ]),
-    #     CarouselColumn(text='約一人前', title='お潰物・サラダ他', actions=[
-    #         MessageAction(label='お潰物・サラダ他 ', text='お潰物・サラダ他-約一人前')
-    #     ]),
-    #     CarouselColumn(text='1袋50ｇ-約一人前', title='お惣菜', actions=[
-    #         MessageAction(label='お惣菜', text='お惣菜1袋50ｇ-約一人前')
-    #     ]),
-    #     CarouselColumn(text=' ', title='一品物', actions=[
-    #         MessageAction(label='一品物', text='一品物')
-    #     ]),
-    #
-    # ])
-    # template_message = TemplateSendMessage(
-    #     alt_text='Carousel alt text', template=carousel_template)
-    # line_bot_api.reply_message(event.reply_token, template_message)
 
 def chonsoluong(event,name):
     row = None
@@ -526,7 +508,7 @@ def addtocart(event,name,num):
         tmpordersheet.insert_row(listoftmporder)
 
 def richmenuRegister():
-    richmenuimg = request.url_root + '/static/richmenu.png'
+    richmenuimg = request.url_root + '/static/richmenu2.jpg'
     response = http.request('GET',richmenuimg)
     # rich_menu_to_create = RichMenu(
     #     size=RichMenuSize(width=2500, height=1686),
@@ -541,7 +523,7 @@ def richmenuRegister():
     #             bounds=RichMenuBounds(x=1250, y=0, width=1250, height=837),
     #             action=MessageAction(label=' ', text='食材・弁当デリバリー')),
     #         RichMenuArea(
-    #             bounds=RichMenuBounds(x=0, y=838, width=2500, height=842),
+    #             bounds=RichMenuBounds(x=0, y=838, width=818, height=842),
     #             action=MessageAction(label=' ', text='営業時間')),
     #         RichMenuArea(
     #             bounds=RichMenuBounds(x=840, y=840, width=818, height=844),
@@ -551,10 +533,10 @@ def richmenuRegister():
     #             action=MessageAction(label=' ', text='メニュー')),
     #            ])
     # rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
-    # reportReceiver.update_cell(2,2,str(rich_menu_id))
+    # reportReceiver.update_cell(5,5,str(rich_menu_id))
 
-    line_bot_api.set_rich_menu_image('richmenu-8bcf01b606fe280c1b4a11760fd48a16','image/png', response.data)
-    line_bot_api.set_default_rich_menu('richmenu-8bcf01b606fe280c1b4a11760fd48a16')
+    line_bot_api.set_rich_menu_image('richmenu-bb7bbcf578758e02b4ee537f2af98b62','image/png', response.data)
+    line_bot_api.set_default_rich_menu('richmenu-bb7bbcf578758e02b4ee537f2af98b62')
 def getsubmenubyname(name):
     if name == 'サンマの開き':
         return 1
@@ -621,8 +603,8 @@ def handle_message(event):
                 submenu4(event)
             if getsubmenubyname(name) == 4:
                 submenu2(event)
-    # elif text =='1':
-    #     richmenuRegister()
+    elif text =='asd':
+        richmenuRegister()
     # elif text == '2':
     #     stfu(event)
     elif text == 'レストラン予約':
@@ -652,10 +634,10 @@ def handle_message(event):
         )
     elif text == 'メニュー':
         menu = request.url_root + '/static/menu.jpg'
-        rszmenu = request.url.root + '/static/menu.jpg'
+        rszmenu = request.url_root + '/static/rsz_menu.jpg'
         line_bot_api.reply_message(
             event.reply_token,
-            ImageSendMessage(rszmenu, menu)
+            ImageSendMessage(menu, rszmenu)
         )
     elif text == '営業時間':
         clearorder(event)
