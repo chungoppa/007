@@ -59,7 +59,36 @@ def callback():
     except InvalidSignatureError:
         abort(400)
     return 'OK'
+def richmenuRegister():
+    richmenuimg = request.url_root + '/static/richmenu2.jpg'
+    response = http.request('GET',richmenuimg)
+    # rich_menu_to_create = RichMenu(
+    #     size=RichMenuSize(width=2500, height=1686),
+    #     selected=False,
+    #     name="メニュー",
+    #     chat_bar_text="メニュー",
+    #     areas=[
+    #         RichMenuArea(
+    #         bounds=RichMenuBounds(x=0, y=0, width=1250, height=845),
+    #         action=MessageAction(label=' ', text='レストラン予約')),
+    #         RichMenuArea(
+    #             bounds=RichMenuBounds(x=1250, y=0, width=1250, height=837),
+    #             action=MessageAction(label=' ', text='食材・弁当デリバリー')),
+    #         RichMenuArea(
+    #             bounds=RichMenuBounds(x=0, y=838, width=818, height=842),
+    #             action=MessageAction(label=' ', text='営業時間')),
+    #         RichMenuArea(
+    #             bounds=RichMenuBounds(x=840, y=840, width=818, height=844),
+    #             action=MessageAction(label=' ', text='お問合せ')),
+    #         RichMenuArea(
+    #             bounds=RichMenuBounds(x=1668, y=845, width=832, height=824),
+    #             action=MessageAction(label=' ', text='メニュー')),
+    #            ])
+    # rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
+    # reportReceiver.update_cell(5,5,str(rich_menu_id))
 
+    line_bot_api.set_rich_menu_image('richmenu-bb7bbcf578758e02b4ee537f2af98b62','image/png', response.data)
+    line_bot_api.set_default_rich_menu('richmenu-bb7bbcf578758e02b4ee537f2af98b62')
 @handler.add(FollowEvent)
 def sendGreetingms(event):
 
