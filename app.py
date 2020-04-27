@@ -303,7 +303,7 @@ def submenu2(event):
         CarouselColumn(text=format(getpricebyname('紅茶豚（スライス５枚）'),',d'), title='紅茶豚（スライス５枚）',
                        thumbnail_image_url=紅茶豚, actions=[PostbackAction(label='カートに追加', data='紅茶豚（スライス５枚）')]),
         CarouselColumn(text=format(getpricebyname('手作り冷凍餃子（５個）'),',d'), title='手作り冷凍餃子（５個）',
-                        thumbnail_image_url=手作り, actions=[PostbackAction(label='カートに追加', data='手作り冷凍餃子（５個）')]),
+                        thumbnail_image_url=手作り, actions=[PostbackAction(label='カートに追加', data='手作り冷凍餃子')]),
         CarouselColumn(text=format(getpricebyname('砂肝にんにく炒め'),',d'), title='砂肝にんにく炒め',
                        thumbnail_image_url=砂肝にんにく炒め, actions=[PostbackAction(label='カートに追加', data='砂肝にんにく炒め')]),
         CarouselColumn(text=format(getpricebyname('ハンバーグ（ソース付）'),',d'), title='ハンバーグ',
@@ -414,12 +414,12 @@ def handle_postback(event):
     # sub2
     elif event.postback.data == '紅茶豚（スライス５枚）':
         chonsoluong(event,'紅茶豚（スライス５枚）')
-    elif event.postback.data == '手作り-冷凍餃子':
+    elif event.postback.data == '手作り冷凍餃子':
         chonsoluong(event,'手作り-冷凍餃子')
     elif event.postback.data == '砂肝にんにく炒め':
         chonsoluong(event,'砂肝にんにく炒め')
 
-    elif event.postback.data == 'ハンバーグ（ソース付）':
+    elif event.postback.data == 'ハンバーグ':
         chonsoluong(event,'ハンバーグ（ソース付）')
     elif event.postback.data == 'エビチリ':
         chonsoluong(event,'エビチリ')
