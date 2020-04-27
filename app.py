@@ -19,6 +19,7 @@ from linebot.exceptions import (
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1, x_proto=1)
 
+# spreadsheet
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('dumbbot-8fad35afb0c6.json', scope)
@@ -61,6 +62,7 @@ def callback():
 
 @handler.add(FollowEvent)
 def sendGreetingms(event):
+
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
             uid = profile.user_id
@@ -96,6 +98,7 @@ def phonenumbervalidator(phonenumber):
     if digit == False or counter >10 or counter<9:
         return '電話番号は数値を入力してください。'
     return 'ok'
+
 @handler.add((MessageEvent),message=TextMessage)
 def getUserinfo(event):
     text = event.message.text
@@ -276,8 +279,7 @@ def submenu1(event):
         CarouselColumn(text=format(getpricebyname('サワラの味噌漬け'),',d'), title='サワラの味噌漬け',
                        thumbnail_image_url=サワラの味噌漬け, actions=[PostbackAction(label='カートに追加', data='サワラの味噌漬け')]),
     ])
-    template_message = TemplateSendMessage(
-        alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
+    template_message = TemplateSendMessage(alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="完了", text="完了")),QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
     line_bot_api.push_message(event.source.user_id, template_message)
 
 # 一品物 4
@@ -318,8 +320,7 @@ def submenu2(event):
         CarouselColumn(text=format(getpricebyname('中華丼（ソースのみ）'),',d'), title='中華丼（ソースのみ）',
                        thumbnail_image_url=中華丼, actions=[PostbackAction(label='カートに追加', data='中華丼（ソースのみ）')]),
     ])
-    template_message = TemplateSendMessage(
-        alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
+    template_message = TemplateSendMessage(alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="完了", text="完了")),QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
     line_bot_api.push_message(event.source.user_id, template_message)
 
 # お潰物・サラダ他　約一人前 2
@@ -329,8 +330,7 @@ def submenu3(event):
         CarouselColumn(text=format(getpricebyname('野菜サラダ'),',d'), title='野菜サラダ',
                        thumbnail_image_url=野菜サラダ, actions=[PostbackAction(label='カートに追加', data='野菜サラダ')]),
     ])
-    template_message = TemplateSendMessage(
-        alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
+    template_message = TemplateSendMessage(alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="完了", text="完了")),QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
     line_bot_api.push_message(event.source.user_id, template_message)
 
 # お惣菜1袋50ｇ 約一人前 3
@@ -346,12 +346,11 @@ def submenu4(event):
         CarouselColumn(text=format(getpricebyname('高菜のじゃこ炒め'),',d'), title='サケ切り身',
                        thumbnail_image_url=高菜のじゃこ炒め, actions=[PostbackAction(label='カートに追加', data='高菜のじゃこ炒め')]),
     ])
-    template_message = TemplateSendMessage(
-        alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
+    template_message = TemplateSendMessage(alt_text='Carousel alt text', template=carousel_template, quick_reply=QuickReply(items=[QuickReplyButton(action=MessageAction(label="完了", text="完了")),QuickReplyButton(action=MessageAction(label="戻る", text="戻る"))]))
     line_bot_api.reply_message(event.reply_token, template_message)
 
 def showsubmenu(event):
-    buttons_template = ButtonsTemplate(text=' ', actions=[
+    buttons_template = ButtonsTemplate(text='品種を選択してください。', actions=[
             MessageAction(label='生鮮食品', text='生鮮食品'),
             MessageAction(label='お潰物・サラダ他 ', text='お潰物・サラダ他-約一人前'),
             MessageAction(label='お惣菜', text='お惣菜1袋50ｇ-約一人前'),
@@ -507,36 +506,6 @@ def addtocart(event,name,num):
         tmpordersheet.delete_row(row)
         tmpordersheet.insert_row(listoftmporder)
 
-def richmenuRegister():
-    richmenuimg = request.url_root + '/static/richmenu2.jpg'
-    response = http.request('GET',richmenuimg)
-    # rich_menu_to_create = RichMenu(
-    #     size=RichMenuSize(width=2500, height=1686),
-    #     selected=False,
-    #     name="メニュー",
-    #     chat_bar_text="メニュー",
-    #     areas=[
-    #         RichMenuArea(
-    #         bounds=RichMenuBounds(x=0, y=0, width=1250, height=845),
-    #         action=MessageAction(label=' ', text='レストラン予約')),
-    #         RichMenuArea(
-    #             bounds=RichMenuBounds(x=1250, y=0, width=1250, height=837),
-    #             action=MessageAction(label=' ', text='食材・弁当デリバリー')),
-    #         RichMenuArea(
-    #             bounds=RichMenuBounds(x=0, y=838, width=818, height=842),
-    #             action=MessageAction(label=' ', text='営業時間')),
-    #         RichMenuArea(
-    #             bounds=RichMenuBounds(x=840, y=840, width=818, height=844),
-    #             action=MessageAction(label=' ', text='お問合せ')),
-    #         RichMenuArea(
-    #             bounds=RichMenuBounds(x=1668, y=845, width=832, height=824),
-    #             action=MessageAction(label=' ', text='メニュー')),
-    #            ])
-    # rich_menu_id = line_bot_api.create_rich_menu(rich_menu=rich_menu_to_create)
-    # reportReceiver.update_cell(5,5,str(rich_menu_id))
-
-    line_bot_api.set_rich_menu_image('richmenu-bb7bbcf578758e02b4ee537f2af98b62','image/png', response.data)
-    line_bot_api.set_default_rich_menu('richmenu-bb7bbcf578758e02b4ee537f2af98b62')
 def getsubmenubyname(name):
     if name == 'サンマの開き':
         return 1
@@ -588,25 +557,7 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=event.source.user_id))
-    if isnumber(text) == True :
-        cell = tmpordersheet.find(str(event.source.user_id))
-        row = cell.row
-        if not tmpordersheet.cell(row,2).value == None:
-            name = str(tmpordersheet.cell(row,2).value)
-            addtocart(event,name,int(text))
-            showitemsincart(event)
-            if getsubmenubyname(name) == 1:
-                submenu1(event)
-            if getsubmenubyname(name) == 2 :
-                submenu3(event)
-            if getsubmenubyname(name) == 3:
-                submenu4(event)
-            if getsubmenubyname(name) == 4:
-                submenu2(event)
-    elif text =='asd':
-        richmenuRegister()
-    # elif text == '2':
-    #     stfu(event)
+
     elif text == 'レストラン予約':
         line_bot_api.reply_message(
             event.reply_token,
@@ -649,10 +600,11 @@ def handle_message(event):
     elif text == '完了':
         try:
             tmp = tmpordersheet.find(str(event.source.user_id))
+            tmpordersheet.update_cell(tmp.row,2,'')
         except:
             tmp = None
         if tmp is None:
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text=' Your cart is empty'))
+            line_bot_api.reply_message(event.reply_token,TextSendMessage(text='あなたのカートは空です'))
         else :
             try:
                 tmp2 = tmpuserinfo.find(str(event.source.user_id))
@@ -666,10 +618,33 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(text='お名前を教えてください。?'))
                 new = [str(event.source.user_id), ""]
                 tmpuserinfo.insert_row(new)
+    elif isnumber(text) == True and checker(event) == True:
+        cell = tmpordersheet.find(str(event.source.user_id))
+        row = cell.row
+        if not tmpordersheet.cell(row,2).value == None:
+            name = str(tmpordersheet.cell(row,2).value)
+            addtocart(event,name,int(text))
+            showitemsincart(event)
+            if getsubmenubyname(name) == 1:
+                submenu1(event)
+            if getsubmenubyname(name) == 2:
+                submenu3(event)
+            if getsubmenubyname(name) == 3:
+                submenu4(event)
+            if getsubmenubyname(name) == 4:
+                submenu2(event)
     elif 1==1:
         getUserinfo(event)
-
-
+# check if user is typing info
+def checker(event):
+    t = None
+    try:
+        t = tmpuserinfo.find(str(event.source.user_id))
+    except :
+        print('')
+    if t == None:
+        return True
+    return False
 
 
 import os
